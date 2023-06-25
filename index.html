@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WEATHER APP</title>
+  <link rel="stylesheet" type="text/css" href="path/to/newfolder.css">
+  <style>
+    td {
+      padding: 100px;
+    }
+
+    * {
+      background-color: rgb(32, 47, 99);
+      color: #fff;
+    }
+
+    .bulletless {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .bulletless li {
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+
+    .container {
+      background-color: grey;
+      padding: 1px;
+      border-radius: 5px;
+    }
+
+    .container:hover {
+      background-color: #fff;
+    }
+
+    button {
+      padding: 12px;
+      border-radius: 12px;
+    }
+
+    a {
+      color: rgb(165, 231, 12);
+    }
+    li{
+        list-style: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+    <div class="weather-app">
+      <form class="search-form" id="search-form">
+        <div class="row">
+          <div class="col-9">
+            <input
+              type="search"
+              placeholder="Type a city.."
+              autofocus="on"
+              autocomplete="off"
+              id="city-input"
+              class="form-control shadow-sm"
+            />
+          </div>
+          <div class="col-3">
+            <input
+              type="submit"
+              value="Search"
+              class="form-control btn btn-primary shadow-sm"
+            />
+          </div>
+        </div>
+      </form>
+      <h1 id="city">
+        Blantyre, Malawi
+      </h1>
+      <ul>
+        <li id="date"></li>
+        <li id="weather-description"></li>
+      </ul>
+      <div class="row">
+        <div class="col-6">
+          <div class="clearfix">
+            <img
+              src=""
+              alt="Weather icon"
+              class="weather-icon float-left"
+              id="weather-icon"
+            />
+            <div class="float-left">
+              <span class="temperature" id="temperature">24</span
+              ><span class="units">
+                <a href="#" id="celsius-link">°C</a> |
+                <a href="#" id="fahrenheit-link">°F</a>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="col-6">
+          <ul>
+            <li>
+              Precipitation: <span id="precipitation"></span>
+            </li>
+            <li>
+              Humidity: <span id="humidity"></span>
+            </li>
+            <li>
+              Wind: <span id="wind-speed"></span>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function formatDate(date) {
+      let hours = date.getHours();
+      if (hours < 10) {
+        hours = `0${hours}`;
+      }
+      let minutes = date.getMinutes();
+      if (minutes < 10) {
+        minutes = `0${minutes}`;
+      }
+
+      let dayIndex = date.getDay();
+      let days = [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday"
+      ];
+      let day = days[dayIndex];
+
+      return `${day} ${hours}:${minutes}`;
+    }
+
+    function search(event) {
+      event.preventDefault();
+      let cityElement = document.querySelector("#city");
+      let cityInput = document.querySelector("#city-input");
+      cityElement.innerHTML = cityInput.value;
+
+      
+      getWeatherData(cityInput.value);
+    }
+
+    function convertToFahrenheit(event) {
+      event.preventDefault();
+      let temperatureElement = document.querySelector("#temperature");
+      let temperature = parseInt(temperatureElement.innerHTML);
+      temperature = Math.round((temperature * 9) / 5 + 32);
+      temperatureElement.innerHTML = temperature;
+    }
+
+    function convertToCelsius(event) {
+      event.preventDefault();
+      let temperatureElement = document.querySelector("#temperature");
+      let temperature = parseInt(temperatureElement.innerHTML);
+      temperature = Math.round(((temperature - 32) * 5) / 9);
+      temperatureElement.innerHTML = temperature;
+    }
+
+    function getWeatherData(city) {
+    
+      let apiKey = '0f8bc384a7c31b717a18cfe38a95ae06';
+      let apiUrl = `https://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}`;
+
+      fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+          updateWeatherData(data);
+        })
+        .catch(error => {
+          console.log("Error:", error);
+        });
+    }
+
+    function updateWeatherData(data) {
+      let temperatureElement = document.querySelector("#temperature");
+      let weatherDescriptionElement = document.querySelector("#weather-description");
+      let weatherIconElement = document.querySelector("#weather-icon");
+      let precipitationElement = document.querySelector("#precipitation");
+      let humidityElement = document.querySelector("#humidity");
+      let windSpeedElement = document.querySelector("#wind-speed");
+
+      temperatureElement.innerHTML = data.current.temp_c;
+      weatherDescriptionElement.innerHTML = data.current.condition.text;
+      weatherIconElement.src = data.current.condition.icon;
+      precipitationElement.innerHTML = `${data.current.precip_mm} mm`;
+      humidityElement.innerHTML = `${data.current.humidity} %`;
+      windSpeedElement.innerHTML = `${data.current.wind_kph} km/h`;
+    }
+
+    let dateElement = document.querySelector("#date");
+    let currentTime = new Date();
+    dateElement.innerHTML = formatDate(currentTime);
+
+    let searchForm = document.querySelector("#search-form");
+    searchForm.addEventListener("submit", search);
+
+    let fahrenheitLink = document.querySelector("#fahrenheit-link");
+    fahrenheitLink.addEventListener("click", convertToFahrenheit);
+
+    let celsiusLink = document.querySelector("#celsius-link");
+    celsiusLink.addEventListener("click", convertToCelsius);
+
+
+    getWeatherData("Blantyre");
+  </script>
+  <a href="https://github.com/Twamb/newproject.git">Open-Source Code </a><br> by Twambie Mwanyungwe
+</body>
+
+</html>
